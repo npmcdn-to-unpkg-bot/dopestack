@@ -5,20 +5,63 @@
 </head>
 <body>
   <h1>Add a thing</h1>
-  <div id="summer">
+  <div id="summerfriends">
     <!---Inputs for the stack--->
+
+    <form id="wejustbeensmokinabowl" onSubmit="sturgill()">
+    <input type="text" name="title" id="title" placeholder="All Night by Chance the Rapper" />
+    <input type="text" name="link" id="link" placeholder="spotify:track:60xaS8mYBKUW4VQQ666N0T" />
+
+<!--
+    <input type="submit" id="submit"/>
+    explicit button shouldn't be necessary if i use the event handler, but wouldn't it be an accessibility issue?
+  -->
+  </form>
   </div>
 
   <div id="dramSingsSpecial">
     <!--Should put tracks into here-->
-  </div>
 
+  </div>
 <script type="text/javascript">
 document.addEventListener("DOMContentLoaded", main(event));
 
+function save(localstorage){
+  //will ask the user to store stuff
+  localstorage.root.getFile("stack.txt", {create:true});
+}
+function enterKey(event) {
+  //because fuck buttons
+  event.preventDefault();
+  if (event.keyCode == 13) {
+      document.getElementById("wejustbeensmokinabowl").submit();
+      return false;
+  }
+}
+function sturgill(e){
+  e.preventDefault();
+
+  alert("Submitted" + document.getElementById("title").value);
+}
+
 function main(e){
-  alert("");
-  //window.webkitRequestFileSystem(window.TEMPORARY, 1024*1024, );
+  // setup button handlers
+  document.getElementById("title").addEventListener("keyup", enterKey);
+  document.getElementById("link").addEventListener("keyup", enterKey);
+
+    /*
+    document.getElementById("ugh").addEventListener("submit", function(e){
+      e.preventDefault();
+      alert("doot doot doot");
+    }); */
+
+  //TODO: check if this shit is already there
+          // if so, load it up
+
+  //otherwise, request and allocate a filesystem:
+  navigator.webkitPersistentStorage.requestQuota(1024*1024, function() {
+    window.webkitRequestFileSystem(window.PERSISTENT, 1024*1024, save);
+  });
 }
 </script>
 </body>
