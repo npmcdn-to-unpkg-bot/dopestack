@@ -4,56 +4,88 @@
 <title>dopeStack</title>
 </head>
 <body>
-  <h1>Add a thing</h1>
-  <div id="summerfriends">
+
+<!---          --->
+
+<h1>DopeStack</h1>
+
+<div id="app">
+  <div id="summerfriends" \>
     <!---Inputs for the stack--->
-
-    <form id="wejustbeensmokinabowl" onSubmit="sturgill()">
-    <input type="text" name="title" id="title" placeholder="All Night by Chance the Rapper" />
-    <input type="text" name="link" id="link" placeholder="spotify:track:60xaS8mYBKUW4VQQ666N0T" />
-
-<!--
-    <input type="submit" id="submit"/>
-    explicit button shouldn't be necessary if i use the event handler, but wouldn't it be an accessibility issue?
-  -->
+    <input v-model="newTodo" placeholder='Add a link' v-on:keyup.enter="addTodo" style="color: orange;">
   </form>
   </div>
 
-  <div id="dramSingsSpecial">
+  <!---          --->
+
+  <div id="dramSingsSpecial" style="color: blue;">
     <!--Should put tracks into here-->
-
+    <ul>
+      <li v-for="elem in dopestack | orderBy 'timestamp' -1">
+        <span><a href="{{ elem.link }}">{{elem.title}}</a></span>
+        <button v-on:click="removeTodo($index)">X</button>
+        <button v-on:click="toggleTitleDialog($index)">📰</button>
+        <input v-model="elem.title" v-show="elem.showTitleInput" />
+        -- <em>{{elem.timestamp}}</em>
+      </li>
+    </ul>
   </div>
-<script type="text/javascript">
-document.addEventListener("DOMContentLoaded", main(event));
 
+  <!---          --->
+</div>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="https://npmcdn.com/vue/dist/vue.js"></script>
+<script type="text/javascript">
+$(document).bind('ready', main(event));
+/*
 function save(localstorage){
   //will ask the user to store stuff
   localstorage.root.getFile("stack.txt", {create:true});
 }
-function enterKey(event) {
-  //because fuck buttons
-  event.preventDefault();
-  if (event.keyCode == 13) {
-      document.getElementById("wejustbeensmokinabowl").submit();
-      return false;
-  }
-}
-function sturgill(e){
-  e.preventDefault();
+*/
 
-  alert("Submitted" + document.getElementById("title").value);
-}
 
 function main(e){
-  // setup button handlers
-  document.getElementById("title").addEventListener("keyup", enterKey);
-  document.getElementById("link").addEventListener("keyup", enterKey);
+  if (!Date.now) {
+    Date.now = function() { return new Date().getTime(); }
+  }
 
-    /*
-    document.getElementById("ugh").addEventListener("submit", function(e){
-      e.preventDefault();
-      alert("doot doot doot");
-    }); */
+  new Vue({
+    el: '#app',
+    data: {
+      newTodo: '',
+      dopestack: [
+
+        /*{ link: 'spotify:track:2SdLeqiPveLBY4GNg47aRO',
+          title: 'Body - Bauuer',
+          timestamp: Date.now(),
+          showTitleInput: false
+        } */
+      ]
+    },
+    methods: {
+      addTodo: function () {
+        var text = this.newTodo.trim()
+        if (text) {
+          this.dopestack.push({ link: text,
+                                timestamp: Date.now(),
+                                title: text,
+                                showTitleInput: true})
+          this.newTodo = ''
+        }
+      },
+      removeTodo: function (index) {
+        this.dopestack.splice(this.dopestack.length - index - 1, 1)
+      },
+      toggleTitleDialog: function(index) {
+        this.dopestack[this.dopestack.length - index - 1].showTitleInput = !this.dopestack[this.dopestack.length - index - 1].showTitleInput
+      },
+      saveTitle: function(index, newTitle){
+        this.dopestack[this.dopestack.length - index - 1].title = newTitle
+      }
+    }
+  });
 
   //TODO: check if this shit is already there
           // if so, load it up
